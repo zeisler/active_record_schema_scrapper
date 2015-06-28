@@ -1,0 +1,50 @@
+# Logfile created on 2015-06-27 09:46:49 -0700 by logger.rb/47272
+D, [2015-06-27T09:46:49.172459 #3483] DEBUG -- :   [1m[36m (0.2ms)[0m  [1mCREATE TABLE "microposts" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "content" varchar, "user_id" integer, "up_votes" integer, "created_at" datetime, "updated_at" datetime) [0m
+D, [2015-06-27T09:46:49.172652 #3483] DEBUG -- :   [1m[35m (0.0ms)[0m  select sqlite_version(*)
+D, [2015-06-27T09:46:49.172886 #3483] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE  INDEX "index_microposts_on_user_id_and_created_at" ON "microposts" ("user_id", "created_at")[0m
+D, [2015-06-27T09:46:49.173189 #3483] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "relationships" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "follower_id" integer, "followed_id" integer, "created_at" datetime, "updated_at" datetime) 
+D, [2015-06-27T09:46:49.173461 #3483] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE  INDEX "index_relationships_on_followed_id" ON "relationships" ("followed_id")[0m
+D, [2015-06-27T09:46:49.173774 #3483] DEBUG -- :   [1m[35m (0.1ms)[0m              SELECT sql
+            FROM sqlite_master
+            WHERE name='index_relationships_on_followed_id' AND type='index'
+            UNION ALL
+            SELECT sql
+            FROM sqlite_temp_master
+            WHERE name='index_relationships_on_followed_id' AND type='index'
+
+D, [2015-06-27T09:46:49.173957 #3483] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE UNIQUE INDEX "index_relationships_on_follower_id_and_followed_id" ON "relationships" ("follower_id", "followed_id")[0m
+D, [2015-06-27T09:46:49.174197 #3483] DEBUG -- :   [1m[35m (0.0ms)[0m              SELECT sql
+            FROM sqlite_master
+            WHERE name='index_relationships_on_follower_id_and_followed_id' AND type='index'
+            UNION ALL
+            SELECT sql
+            FROM sqlite_temp_master
+            WHERE name='index_relationships_on_follower_id_and_followed_id' AND type='index'
+
+D, [2015-06-27T09:46:49.174321 #3483] DEBUG -- :   [1m[36m (0.0ms)[0m  [1m            SELECT sql
+            FROM sqlite_master
+            WHERE name='index_relationships_on_followed_id' AND type='index'
+            UNION ALL
+            SELECT sql
+            FROM sqlite_temp_master
+            WHERE name='index_relationships_on_followed_id' AND type='index'
+[0m
+D, [2015-06-27T09:46:49.174470 #3483] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE  INDEX "index_relationships_on_follower_id" ON "relationships" ("follower_id")
+D, [2015-06-27T09:46:49.176240 #3483] DEBUG -- :   [1m[36m (0.2ms)[0m  [1mCREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "email" varchar DEFAULT '', "credits" decimal(19,6), "created_at" datetime, "updated_at" datetime, "password_digest" varchar, "remember_token" boolean DEFAULT 't', "admin" boolean DEFAULT 'f') [0m
+D, [2015-06-27T09:46:49.176599 #3483] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE TABLE "accounts" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer, "balance" decimal) 
+D, [2015-06-27T09:46:49.176884 #3483] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "naics" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "code" decimal) [0m
+D, [2015-06-27T09:46:49.177199 #3483] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE UNIQUE INDEX "index_users_on_email" ON "users" ("email")
+D, [2015-06-27T09:46:49.177467 #3483] DEBUG -- :   [1m[36m (0.0ms)[0m  [1m            SELECT sql
+            FROM sqlite_master
+            WHERE name='index_users_on_email' AND type='index'
+            UNION ALL
+            SELECT sql
+            FROM sqlite_temp_master
+            WHERE name='index_users_on_email' AND type='index'
+[0m
+D, [2015-06-27T09:46:49.177715 #3483] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE  INDEX "index_users_on_remember_token" ON "users" ("remember_token")
+D, [2015-06-27T09:46:49.178843 #3483] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mCREATE TABLE "schema_migrations" ("version" varchar NOT NULL) [0m
+D, [2015-06-27T09:46:49.179143 #3483] DEBUG -- :   [1m[35m (0.1ms)[0m  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+D, [2015-06-27T09:46:49.179289 #3483] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mSELECT version FROM "schema_migrations"[0m
+D, [2015-06-27T09:46:49.179422 #3483] DEBUG -- :   [1m[35m (0.0ms)[0m  INSERT INTO "schema_migrations" (version) VALUES ('20130315230445')
+D, [2015-06-27T09:46:49.182008 #3483] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mSELECT COUNT(*) FROM "users"[0m
