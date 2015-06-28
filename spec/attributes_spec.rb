@@ -21,13 +21,22 @@ describe ActiveRecordSchemaScrapper::Attributes do
               )
       end
 
-      it Account do
-        expect(described_class.new(model: Account).map(&:to_h).map { |h| h.reject { |_, v| v.nil? } })
+      context 'Account' do
+        it 'can iterate over twice' do
+          subject = described_class.new(model: Account)
+          expect(subject.map(&:to_h).map { |h| h.reject { |_, v| v.nil? } })
           .to eq(
                 [{ name: "id", type: Fixnum },
                  { name: "user_id", type: Fixnum },
                  { name: "balance", type: BigDecimal }]
               )
+          expect(subject.map(&:to_h).map { |h| h.reject { |_, v| v.nil? } })
+            .to eq(
+                  [{ name: "id", type: Fixnum },
+                   { name: "user_id", type: Fixnum },
+                   { name: "balance", type: BigDecimal }]
+                )
+        end
       end
 
       it ChildModel do
@@ -44,46 +53,46 @@ describe ActiveRecordSchemaScrapper::Attributes do
                  { name: "admin", type: Axiom::Types::Boolean, default: false }]
               )
       end
-
-      describe "::register_type" do
-
-        it "add new type" do
-          described_class.register_type(name: :array, klass: Array)
-          expect(ActiveRecordSchemaScrapper::Attribute.new(type: :array).type).to eq(Array)
-        end
-
-        context "unknown types will raise" do
-
-          it "foo_type" do
-            expect { ActiveRecordSchemaScrapper::Attribute.new(type: :foo_type).type }
-              .to raise_error(ActiveRecordSchemaScrapper::UnregisteredType, "Database type 'foo_type' is not a registered type.\nTo register use ActiveRecordSchemaScrapper::Attributes.register_type(name: :foo_type, klass: <RubyClass>)")
-          end
-
-          it "another_type" do
-            expect { ActiveRecordSchemaScrapper::Attribute.new(type: :another_type).type }
-              .to raise_error(ActiveRecordSchemaScrapper::UnregisteredType, "Database type 'another_type' is not a registered type.\nTo register use ActiveRecordSchemaScrapper::Attributes.register_type(name: :another_type, klass: <RubyClass>)")
-          end
-
-        end
-
-      end
-
-      describe "::register_default" do
-
-        it "add default type converter" do
-          described_class.register_default(name: "T", klass: true)
-          expect(ActiveRecordSchemaScrapper::Attribute.new(default: :T).default).to eq(true)
-        end
-
-        it "will pass nil if no registered value" do
-          expect(ActiveRecordSchemaScrapper::Attribute.new(default: nil).default).to eq(nil)
-        end
-
-        it "will pass value if no registered value" do
-          expect(ActiveRecordSchemaScrapper::Attribute.new(default: :Q).default).to eq(:Q)
-        end
-
-      end
     end
+  end
+
+  describe "::register_type" do
+
+    it "add new type" do
+      described_class.register_type(name: :array, klass: Array)
+      expect(ActiveRecordSchemaScrapper::Attribute.new(type: :array).type).to eq(Array)
+    end
+
+    context "unknown types will raise" do
+
+      it "foo_type" do
+        expect { ActiveRecordSchemaScrapper::Attribute.new(type: :foo_type).type }
+          .to raise_error(ActiveRecordSchemaScrapper::UnregisteredType, "Database type 'foo_type' is not a registered type.\nTo register use ActiveRecordSchemaScrapper::Attributes.register_type(name: :foo_type, klass: <RubyClass>)")
+      end
+
+      it "another_type" do
+        expect { ActiveRecordSchemaScrapper::Attribute.new(type: :another_type).type }
+          .to raise_error(ActiveRecordSchemaScrapper::UnregisteredType, "Database type 'another_type' is not a registered type.\nTo register use ActiveRecordSchemaScrapper::Attributes.register_type(name: :another_type, klass: <RubyClass>)")
+      end
+
+    end
+
+  end
+
+  describe "::register_default" do
+
+    it "add default type converter" do
+      described_class.register_default(name: "T", klass: true)
+      expect(ActiveRecordSchemaScrapper::Attribute.new(default: :T).default).to eq(true)
+    end
+
+    it "will pass nil if no registered value" do
+      expect(ActiveRecordSchemaScrapper::Attribute.new(default: nil).default).to eq(nil)
+    end
+
+    it "will pass value if no registered value" do
+      expect(ActiveRecordSchemaScrapper::Attribute.new(default: :Q).default).to eq(:Q)
+    end
+
   end
 end

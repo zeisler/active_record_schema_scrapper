@@ -8,16 +8,7 @@ module ActiveRecordSchemaScrapper
     include Enumerable
 
     def each
-      @attributes ||= model.columns_hash.map do |k, v|
-        yield(Attribute.new(name:      k,
-                            type:      v.type,
-                            precision: v.cast_type.precision,
-                            limit:     v.cast_type.limit,
-                            scale:     v.cast_type.scale,
-                            default:   v.default,
-                            null:      v.null,
-        ))
-      end
+      call.each { |attr| yield(attr) }
     end
 
     def self.register_type(name:, klass:)
@@ -39,6 +30,19 @@ module ActiveRecordSchemaScrapper
     private
 
     attr_reader :model
+
+    def call
+      @attributes ||= model.columns_hash.map do |k, v|
+        Attribute.new(name:      k,
+                      type:      v.type,
+                      precision: v.cast_type.precision,
+                      limit:     v.cast_type.limit,
+                      scale:     v.cast_type.scale,
+                      default:   v.default,
+                      null:      v.null,
+        )
+      end
+    end
 
   end
 end
