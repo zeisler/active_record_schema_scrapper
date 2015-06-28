@@ -3,7 +3,7 @@ require 'sqlite3'
 require 'logger'
 
 
-File.delete('debug.log')
+File.delete('debug.log') if File.exist?('debug.log')
 ActiveRecord::Base.logger = Logger.new('debug.log')
 ActiveRecord::Base.establish_connection(adapter:  'sqlite3',
                                         database: ":memory:",
