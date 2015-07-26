@@ -1,8 +1,9 @@
 module ActiveRecordSchemaScrapper
   class Associations
 
-    def initialize(model:)
+    def initialize(model:, types: self.class.types)
       @model = model
+      @types = types
     end
 
     include Enumerable
@@ -10,7 +11,6 @@ module ActiveRecordSchemaScrapper
     def each
       types.each do |type|
         model.reflect_on_all_associations(type).each do |a|
-          puts ''
           hash = if a.try(:delegate_reflection)
                    { source:    a.delegate_reflection.options[:source],
                      through:   a.delegate_reflection.options[:through],
@@ -26,42 +26,22 @@ module ActiveRecordSchemaScrapper
                              class_name:  a.klass.name,
                              type:        type,
                            })
-          yield(Association.new(hash))
+          yield(ActiveRecordSchemaScrapper::Association.new(hash))
         end
       end
+    end
 
+    def to_a
+      map {|v| v}
+    end
 
+    def self.types
+      [:has_and_belongs_to_many, :belongs_to, :has_one, :has_many]
     end
 
     private
 
-    def select_only_current_class(type)
-      model.reflect_on_all_associations(type).select do |a|
-        klass.relationships.send(type).map(&:name).include?(a.name)
-      end
-    end
-
-    def belongs_to
-      select_only_current_class(:belongs_to)
-    end
-
-    def has_one
-      select_only_current_class(:has_one)
-    end
-
-    def has_and_belongs_to_many
-      select_only_current_class(:has_and_belongs_to_many)
-    end
-
-    def has_many
-      select_only_current_class(:has_many)
-    end
-
-    def types
-      [:has_and_belongs_to_many, :belongs_to, :has_one, :has_many]
-    end
-
-    attr_reader :model
+    attr_reader :model, :types
 
   end
 end

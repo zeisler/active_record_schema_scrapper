@@ -5,10 +5,35 @@ require "active_record_schema_scrapper/association"
 require "active_record_schema_scrapper/associations"
 
 describe ActiveRecordSchemaScrapper::Associations do
-
   describe 'User' do
+    describe 'by type' do
 
-    subject{ described_class.new(model: User) }
+      def subject(type)
+        described_class.new(model: User, types: type).to_a.map(&:name)
+      end
+
+      it '[:has_many]' do
+        expect(subject([:has_many]))
+          .to eq([:microposts, :relationships, :followed_users, :reverse_relationships, :followers])
+      end
+
+      it '[:belongs_to]' do
+        expect(subject([:belongs_to]))
+          .to eq([])
+      end
+
+      it '[:has_one]' do
+        expect(subject([:has_one]))
+          .to eq([:account])
+      end
+
+      it '[:has_and_belongs_to_many]' do
+        expect(subject([:has_and_belongs_to_many]))
+          .to eq([])
+      end
+    end
+
+    subject { described_class.new(model: User) }
 
     it 'microposts' do
       expect(subject.detect { |a| a.name == :microposts }.to_h)
@@ -39,7 +64,5 @@ describe ActiveRecordSchemaScrapper::Associations do
       expect(subject.detect{|a| a.name == :account}.to_h)
         .to eq({ name: :account, class_name: :Account, type: :has_one, through: nil, source: nil, foreign_key: :user_id, join_table: nil, dependent: nil })
     end
-
   end
-
 end
