@@ -1,4 +1,5 @@
 # ActiveRecordSchemaScrapper
+[![Build Status](https://travis-ci.org/zeisler/dissociated_introspection.svg)](https://travis-ci.org/zeisler/dissociated_introspection)
 [![Code Climate](https://codeclimate.com/github/zeisler/active_record_schema_scrapper/badges/gpa.svg)](https://codeclimate.com/github/zeisler/active_record_schema_scrapper)
 [![Test Coverage](https://codeclimate.com/github/zeisler/active_record_schema_scrapper/badges/coverage.svg)](https://codeclimate.com/github/zeisler/active_record_schema_scrapper/coverage)
 
