@@ -1,4 +1,6 @@
 # ActiveRecordSchemaScrapper
+[![Code Climate](https://codeclimate.com/github/zeisler/active_record_schema_scrapper/badges/gpa.svg)](https://codeclimate.com/github/zeisler/active_record_schema_scrapper)
+[![Test Coverage](https://codeclimate.com/github/zeisler/active_record_schema_scrapper/badges/coverage.svg)](https://codeclimate.com/github/zeisler/active_record_schema_scrapper/coverage)
 
 This gem gives a simple API for ActiveRecord model meta data, including attributes and associations.
 
