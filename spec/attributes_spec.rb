@@ -6,7 +6,7 @@ require "active_record_schema_scrapper/attributes"
 describe ActiveRecordSchemaScrapper::Attributes do
   describe "Enumerable" do
     context "returns columns with meta data" do
-      it User do
+      it "User" do
         expect(described_class.new(model: User).map(&:to_h).map { |h| h.reject { |_, v| v.nil? } })
           .to eq(
                 [{ name: "id", type: Fixnum },
@@ -21,8 +21,8 @@ describe ActiveRecordSchemaScrapper::Attributes do
               )
       end
 
-      context 'Account' do
-        it 'can iterate over twice' do
+      context "Account" do
+        it "can iterate over twice" do
           subject = described_class.new(model: Account)
           expect(subject.map(&:to_h).map { |h| h.reject { |_, v| v.nil? } })
           .to eq(
@@ -39,7 +39,7 @@ describe ActiveRecordSchemaScrapper::Attributes do
         end
       end
 
-      it ChildModel do
+      it "ChildModel" do
         expect(described_class.new(model: ChildModel).map(&:to_h).map { |h| h.reject { |_, v| v.nil? } })
           .to eq(
                 [{ name: "id", type: Fixnum },
@@ -74,9 +74,7 @@ describe ActiveRecordSchemaScrapper::Attributes do
         expect { ActiveRecordSchemaScrapper::Attribute.new(type: :another_type).type }
           .to raise_error(ActiveRecordSchemaScrapper::UnregisteredType, "Database type 'another_type' is not a registered type.\nTo register use ActiveRecordSchemaScrapper::Attributes.register_type(name: :another_type, klass: <RubyClass>)")
       end
-
     end
-
   end
 
   describe "::register_default" do
@@ -93,6 +91,5 @@ describe ActiveRecordSchemaScrapper::Attributes do
     it "will pass value if no registered value" do
       expect(ActiveRecordSchemaScrapper::Attribute.new(default: :Q).default).to eq(:Q)
     end
-
   end
 end
