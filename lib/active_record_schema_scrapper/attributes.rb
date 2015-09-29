@@ -1,4 +1,4 @@
-module ActiveRecordSchemaScrapper
+class ActiveRecordSchemaScrapper
   class Attributes
 
     def initialize(model:)
@@ -9,6 +9,10 @@ module ActiveRecordSchemaScrapper
 
     def each
       call.each { |attr| yield(attr) }
+    end
+
+    def to_a
+      map { |v| v }
     end
 
     def self.register_type(name:, klass:)

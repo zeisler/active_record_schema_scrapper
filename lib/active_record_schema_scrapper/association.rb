@@ -1,4 +1,4 @@
-module ActiveRecordSchemaScrapper
+class ActiveRecordSchemaScrapper
   class Association
     include Virtus.model
     attribute :name, Symbol

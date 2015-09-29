@@ -4,7 +4,6 @@ require "models"
 
 describe ActiveRecordSchemaScrapper do
   describe "new" do
-
     subject { described_class.new(model: User) }
 
     describe "#attributes" do
@@ -21,7 +20,7 @@ describe ActiveRecordSchemaScrapper do
     describe "#associations" do
       it "passes any attributes through" do
         expect(described_class::Associations).to receive(:new).and_call_original.with({model: User, types: [:belongs_to]})
-        subject.associations(types: [:belongs_to])
+        described_class.new(model: User, association_opts: {types: [:belongs_to]}).associations
       end
 
       it "returns an Associations class" do
@@ -31,6 +30,11 @@ describe ActiveRecordSchemaScrapper do
 
     describe "table_name" do
       it { expect(subject.table_name).to eq('users') }
+    end
+
+    describe "abstract_class?" do
+      it { expect(subject.abstract_class?).to eq(false) }
+      it { expect(described_class.new(model: HasNoTable).abstract_class?).to eq(true) }
     end
   end
 end

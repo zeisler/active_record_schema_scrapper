@@ -1,4 +1,4 @@
-module ActiveRecordSchemaScrapper
+class ActiveRecordSchemaScrapper
   class Associations
 
     def initialize(model:, types: self.class.types)

@@ -1,3 +1,3 @@
-module ActiveRecordSchemaScrapper
+class ActiveRecordSchemaScrapper
   VERSION = "0.1.0"
 end

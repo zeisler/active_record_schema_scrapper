@@ -1,6 +1,6 @@
 require "virtus"
 
-module ActiveRecordSchemaScrapper
+class ActiveRecordSchemaScrapper
   class UnregisteredType < StandardError
   end
 
