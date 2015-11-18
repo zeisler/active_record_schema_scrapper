@@ -17,9 +17,20 @@ describe ActiveRecordSchemaScrapper::Associations do
           .to eq([:microposts, :relationships, :followed_users, :reverse_relationships, :followers])
       end
 
-      it '[:belongs_to]' do
-        expect(subject([:belongs_to]))
-          .to eq([])
+      context '[:belongs_to]' do
+        it do
+          expect(subject([:belongs_to]))
+            .to eq([])
+        end
+
+        context 'when an association cannot not be found' do
+
+          it 'is added to the errors array' do
+            subject = described_class.new(model: User, types: [:belongs_to])
+            subject.to_a
+            expect(subject.errors).to eq(['Missing model IDontExist for association User.belongs_to :i_dont_exist'])
+          end
+        end
       end
 
       it '[:has_one]' do

@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
                                    dependent:   :destroy
   has_many :followers, through: :reverse_relationships, source: :follower
   has_one :account
+  belongs_to :i_dont_exist
   scope :find_by_name, -> (name) { where(name: name) }
   scope :by_name, -> (name) { where(name: name) }
   scope :no_arg_scope, -> { where(name: 'name') }
