@@ -56,6 +56,22 @@ describe ActiveRecordSchemaScrapper::Attributes do
     end
   end
 
+  describe "#errors" do
+
+    it "returns errors messages when and model doesn't respond to column_hash" do
+      class InvalidClass
+      end
+
+      subject = described_class.new(model: InvalidClass)
+      subject.to_a
+      error = subject.errors.first
+      expect(error.class_name).to eq("InvalidClass")
+      expect(error.message).to eq("InvalidClass is not a valid ActiveRecord model.")
+      expect(error.original_error.to_s).to eq("undefined method `columns_hash' for InvalidClass:Class")
+    end
+
+  end
+
   describe "::register_type" do
 
     it "add new type" do

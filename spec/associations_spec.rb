@@ -24,11 +24,13 @@ describe ActiveRecordSchemaScrapper::Associations do
         end
 
         context 'when an association cannot not be found' do
-
           it 'is added to the errors array' do
             subject = described_class.new(model: User, types: [:belongs_to])
             subject.to_a
-            expect(subject.errors).to eq(['Missing model IDontExist for association User.belongs_to :i_dont_exist'])
+            error = subject.errors.first
+            expect(error.message).to eq('Missing model IDontExist for association User.belongs_to :i_dont_exist')
+            expect(error.class_name).to eq("User")
+            expect(error.original_error.to_s).to eq("uninitialized constant User::IDontExist")
           end
         end
       end

@@ -21,16 +21,16 @@ class ActiveRecordSchemaScrapper
                      { source:    a.try(:delegate_reflection).try(:name),
                        through:   a.try(:through),
                        dependent: a.options[:dependent] }
-                   end.merge({
-                               name:        a.name,
-                               foreign_key: a.foreign_key,
-                               class_name:  a.klass.name,
-                               type:        type,
-                             })
+                   end.merge(name:        a.name,
+                             foreign_key: a.foreign_key,
+                             class_name:  a.klass.name,
+                             type:        type)
 
             yield(ActiveRecordSchemaScrapper::Association.new(hash))
           rescue NameError => e
-            errors << "Missing model #{a.name.to_s.camelize} for association #{model.name}.belongs_to :#{a.name}"
+            errors << OpenStruct.new(class_name:    model.name,
+                                     message:       "Missing model #{a.name.to_s.camelize} for association #{model.name}.belongs_to :#{a.name}",
+                                     original_error: e)
           end
         end
       end

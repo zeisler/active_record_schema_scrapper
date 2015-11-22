@@ -2,7 +2,8 @@ class ActiveRecordSchemaScrapper
   class Attributes
 
     def initialize(model:)
-      @model = model
+      @model  = model
+      @errors = []
     end
 
     include Enumerable
@@ -31,6 +32,8 @@ class ActiveRecordSchemaScrapper
       @registered_defaults ||= []
     end
 
+    attr_reader :errors
+
     private
 
     attr_reader :model
@@ -47,6 +50,10 @@ class ActiveRecordSchemaScrapper
             null:      v.null,
         )
       end
+    rescue NoMethodError => e
+      @errors << OpenStruct.new(class_name:    model.name,
+                                message:       "#{model.name} is not a valid ActiveRecord model.",
+                                original_error: e)
     end
   end
 end
