@@ -1,7 +1,12 @@
 language: ruby
 rvm:
-  - 2.1.6
+  - 2.1.7
   - 2.2.3
+gemfiles:
+  - gemfiles/activerecord_4.0.gemfile
+  - gemfiles/activerecord_4.1.gemfile
+  - gemfiles/activerecord_4.2.gemfile
 addons:
   code_climate:
     repo_token: 195e47348f8bfd2121f478ac86ae42bcc65679b4e2beed7e7e2867469b27fd01
+

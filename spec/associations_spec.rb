@@ -17,6 +17,18 @@ describe ActiveRecordSchemaScrapper::Associations do
           .to eq([:microposts, :relationships, :followed_users, :reverse_relationships, :followers])
       end
 
+      it do
+        expect(described_class.new(model: User).map(&:to_h))
+          .to eq([
+                   { name: :account, class_name: :Account, type: :has_one, through: nil, source: nil, foreign_key: :user_id, join_table: nil, dependent: nil },
+                   { name: :microposts, class_name: :Micropost, type: :has_many, through: nil, source: nil, foreign_key: :user_id, join_table: nil, dependent: nil },
+                   { name: :relationships, class_name: :Relationship, type: :has_many, through: nil, source: nil, foreign_key: :follower_id, join_table: nil, dependent: :destroy },
+                   { name: :followed_users, class_name: :User, type: :has_many, through: :relationships, source: :followed, foreign_key: :followed_id, join_table: nil, dependent: nil },
+                   { name: :reverse_relationships, class_name: :Relationship, type: :has_many, through: nil, source: nil, foreign_key: :followed_id, join_table: nil, dependent: :destroy },
+                   { name: :followers, :class_name => :User, :type => :has_many, :through => :reverse_relationships, :source => :follower, :foreign_key => :follower_id, :join_table => nil, :dependent => nil }
+                 ])
+      end
+
       context '[:belongs_to]' do
         it do
           expect(subject([:belongs_to]))
@@ -31,6 +43,18 @@ describe ActiveRecordSchemaScrapper::Associations do
             expect(error.message).to eq('Missing model IDontExist for association User.belongs_to :i_dont_exist')
             expect(error.class_name).to eq("User")
             expect(error.original_error.to_s).to eq("uninitialized constant User::IDontExist")
+            expect(error.level).to eq(:error)
+          end
+        end
+
+        context 'when an association cannot not be found' do
+          it 'is added to the errors array' do
+            subject = described_class.new(model: OpenStruct.new(abstract_class?: true, name: "AbstractClass"))
+            subject.to_a
+            error = subject.errors.first
+            expect(error.message).to eq("AbstractClass is an abstract class and has no associated table.")
+            expect(error.class_name).to eq("AbstractClass")
+            expect(error.level).to eq(:warn)
           end
         end
       end
@@ -55,7 +79,7 @@ describe ActiveRecordSchemaScrapper::Associations do
 
     it 'relationships' do
       expect(subject.detect { |a| a.name == :relationships }.to_h)
-        .to eq({ name: :relationships, class_name: :Relationship, type: :has_many, through: nil, source: nil, foreign_key: :follower_id, join_table: nil , dependent: :destroy})
+        .to eq({ name: :relationships, class_name: :Relationship, type: :has_many, through: nil, source: nil, foreign_key: :follower_id, join_table: nil, dependent: :destroy })
     end
 
     it 'followed_users' do
@@ -74,7 +98,7 @@ describe ActiveRecordSchemaScrapper::Associations do
     end
 
     it 'account' do
-      expect(subject.detect{|a| a.name == :account}.to_h)
+      expect(subject.detect { |a| a.name == :account }.to_h)
         .to eq({ name: :account, class_name: :Account, type: :has_one, through: nil, source: nil, foreign_key: :user_id, join_table: nil, dependent: nil })
     end
   end

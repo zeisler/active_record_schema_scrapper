@@ -24,7 +24,7 @@ class ActiveRecordSchemaScrapper
   end
 
   def abstract_class?
-    model.abstract_class? || false
+    !!model.abstract_class?
   end
 
   private

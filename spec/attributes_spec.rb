@@ -68,6 +68,7 @@ describe ActiveRecordSchemaScrapper::Attributes do
       expect(error.class_name).to eq("InvalidClass")
       expect(error.message).to eq("InvalidClass is not a valid ActiveRecord model.")
       expect(error.original_error.to_s).to eq("undefined method `columns_hash' for InvalidClass:Class")
+      expect(error.level).to eq(:error)
     end
 
   end
