@@ -23,16 +23,38 @@ Or install it yourself as:
 
 ## Usage
 
-    ActiveRecordSchemaScrapper::Attributes.new(model: User).to_h 
-        #=>[{ name: "id", type: Fixnum },
-            { name: "name", type: String },
-            { name: "email", type: String, default: "" },
-            { name: "credits", type: BigDecimal, precision: 19, scale: 6 },
-            { name: "created_at", type: DateTime },
-            { name: "updated_at", type: DateTime },
-            { name: "password_digest", type: String },
-            { name: "remember_token", type: Axiom::Types::Boolean, default: true },
-            { name: "admin", type: Axiom::Types::Boolean, default: false }]
+### Attributes
+```ruby
+    ActiveRecordSchemaScrapper::Attributes.new(model: User).map(&:to_h)
+        #=>[{ name: "id",               type: Fixnum                                },
+            { name: "name",             type: String                                },
+            { name: "email",            type: String,     default: ""               },
+            { name: "credits",          type: BigDecimal, precision: 19, scale: 6   },
+            { name: "created_at",       type: DateTime                              },
+            { name: "updated_at",       type: DateTime                              },
+            { name: "password_digest",  type: String                                },
+            { name: "remember_token",   type: Axiom::Types::Boolean, default: true  },
+            { name: "admin",            type: Axiom::Types::Boolean, default: false }]
+            
+    ActiveRecordSchemaScrapper::Attributes.new(model: User).errors
+        #=> []
+```
+
+### Associations
+```ruby
+    ActiveRecordSchemaScrapper::Associations.new(model: User).map(&:to_h)
+        #=>[{ name: :account, class_name: :Account, type: :has_one, through: nil, source: nil, foreign_key: :user_id, join_table: nil, dependent: nil },
+            { name: :microposts, class_name: :Micropost, type: :has_many, through: nil, source: nil, foreign_key: :user_id, join_table: nil, dependent: nil },
+            { name: :relationships, class_name: :Relationship, type: :has_many, through: nil, source: nil, foreign_key: :follower_id, join_table: nil, dependent: :destroy },
+            { name: :followed_users, class_name: :User, type: :has_many, through: :relationships, source: :followed, foreign_key: :followed_id, join_table: nil, dependent: nil },
+            { name: :reverse_relationships, class_name: :Relationship, type: :has_many, through: nil, source: nil, foreign_key: :followed_id, join_table: nil, dependent: :destroy },
+            { name: :followers, :class_name => :User, :type => :has_many, :through => :reverse_relationships, :source => :follower, :foreign_key => :follower_id, :join_table => nil, :dependent => nil }]
+    
+    ActiveRecordSchemaScrapper::Attributes.new(model: User).errors.map(&:message)
+        #=> ["'Missing model Account for association User.belongs_to :account')"]
+```
+
+Supported versions of ActiveRecord: 4.0 - 4.2
 
 ## Development
 
