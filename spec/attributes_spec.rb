@@ -87,8 +87,8 @@ describe ActiveRecordSchemaScrapper::Attributes do
       expect(subject.to_a).to eq([])
       error = subject.errors.first
       expect(error.class_name).to eq("HasNoTable")
-      expect(error.message).to eq("Could not find table 'has_no_tables'")
-      expect(error.original_error.to_s).to eq("Could not find table 'has_no_tables'")
+      expect(error.message).to match(/Could not find table/)
+      expect(error.original_error.to_s).to match(/Could not find table/)
       expect(error.level).to eq(:error)
     end
   end
