@@ -56,6 +56,15 @@ class ActiveRecordSchemaScrapper
                                 message:        "#{model.name} is not a valid ActiveRecord model.",
                                 original_error: e,
                                 level:          :error)
+        []
+    rescue ActiveRecord::StatementInvalid => e
+      level   = model.abstract_class? ? :warn : :error
+      message = model.abstract_class? ? "Could not find table for abstract_class" : e.message
+      @errors << OpenStruct.new(class_name:     model.name,
+                                message:        message,
+                                original_error: e,
+                                level:          level)
+      []
     end
   end
 end
