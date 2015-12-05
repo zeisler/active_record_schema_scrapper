@@ -12,9 +12,24 @@ describe ActiveRecordSchemaScrapper::Associations do
         described_class.new(model: User, types: type).to_a.map(&:name)
       end
 
-      it '[:has_many]' do
-        expect(subject([:has_many]))
-          .to eq([:microposts, :relationships, :followed_users, :reverse_relationships, :followers])
+      context '[:has_many]' do
+        it do
+          expect(subject([:has_many]))
+            .to eq([:microposts, :relationships, :followed_users, :reverse_relationships, :followers])
+        end
+
+        context 'when an association cannot not be found' do
+          it 'is added to the errors array' do
+            subject = described_class.new(model: User, types: [:has_many])
+            subject.to_a
+            error = subject.errors.first
+            expect(error.message).to eq('Missing model IDontExist for association User.belongs_to :i_dont_exists')
+            expect(error.class_name).to eq("User")
+            expect(error.original_error.to_s).to eq("uninitialized constant User::IDontExist")
+            expect(error.level).to eq(:error)
+            expect(error.type).to eq(:association)
+          end
+        end
       end
 
       it do
@@ -44,6 +59,7 @@ describe ActiveRecordSchemaScrapper::Associations do
             expect(error.class_name).to eq("User")
             expect(error.original_error.to_s).to eq("uninitialized constant User::IDontExist")
             expect(error.level).to eq(:error)
+            expect(error.type).to eq(:association)
           end
         end
 
@@ -55,6 +71,7 @@ describe ActiveRecordSchemaScrapper::Associations do
             expect(error.message).to eq("AbstractClass is an abstract class and has no associated table.")
             expect(error.class_name).to eq("AbstractClass")
             expect(error.level).to eq(:warn)
+            expect(error.type).to eq(:no_table)
           end
         end
       end
