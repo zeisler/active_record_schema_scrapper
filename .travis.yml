@@ -6,7 +6,6 @@ gemfile:
   - gemfiles/activerecord_4.0.gemfile
   - gemfiles/activerecord_4.1.gemfile
   - gemfiles/activerecord_5.gemfile
-  - Gemfile
 matrix:
   exclude:
     - rvm: 2.1.7
