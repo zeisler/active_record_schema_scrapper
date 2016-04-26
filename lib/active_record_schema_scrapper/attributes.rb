@@ -44,9 +44,9 @@ class ActiveRecordSchemaScrapper
         ActiveRecordSchemaScrapper::Attribute.new(
           name:      k,
           type:      v.type,
-          precision: v.cast_type.precision,
-          limit:     v.cast_type.limit,
-          scale:     v.cast_type.scale,
+          precision: v.precision,
+          limit:     v.limit,
+          scale:     v.scale,
           default:   v.default,
           null:      v.null,
         )
