@@ -42,7 +42,7 @@ GEM
     ice_nine (0.11.2)
     json (1.8.3)
     minitest (5.8.4)
-    rake (10.5.0)
+    rake (11.1.2)
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
@@ -82,7 +82,7 @@ DEPENDENCIES
   appraisal (~> 2.0)
   bundler (~> 1.9)
   codeclimate-test-reporter (~> 0.5)
-  rake (>= 9.0)
+  rake (>= 10.0)
   rspec (~> 3.4)
   sqlite3 (~> 1.3)
 
