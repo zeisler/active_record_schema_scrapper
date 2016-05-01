@@ -8,13 +8,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (5.0.0.beta3)
-      activesupport (= 5.0.0.beta3)
-    activerecord (5.0.0.beta3)
-      activemodel (= 5.0.0.beta3)
-      activesupport (= 5.0.0.beta3)
+    activemodel (5.0.0.beta4)
+      activesupport (= 5.0.0.beta4)
+    activerecord (5.0.0.beta4)
+      activemodel (= 5.0.0.beta4)
+      activesupport (= 5.0.0.beta4)
       arel (~> 7.0)
-    activesupport (5.0.0.beta3)
+    activesupport (5.0.0.beta4)
       concurrent-ruby (~> 1.0)
       i18n (~> 0.7)
       minitest (~> 5.1)
@@ -77,8 +77,8 @@ PLATFORMS
 
 DEPENDENCIES
   active_record_schema_scrapper!
-  activerecord (= 5.0.0.beta3)
-  activesupport (= 5.0.0.beta3)
+  activerecord (= 5.0.0.beta4)
+  activesupport (= 5.0.0.beta4)
   appraisal (~> 2.0)
   bundler (~> 1.9)
   codeclimate-test-reporter (~> 0.5)
