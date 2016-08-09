@@ -1,4 +1,5 @@
 require "active_record_schema_scrapper/version"
+require "active_record_schema_scrapper/object_error"
 require "active_record_schema_scrapper/attribute"
 require "active_record_schema_scrapper/attributes"
 require "active_record_schema_scrapper/association"

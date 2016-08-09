@@ -30,10 +30,13 @@ class ActiveRecordSchemaScrapper
 
             yield(ActiveRecordSchemaScrapper::Association.new(hash))
           rescue NameError => e
-            errors << OpenStruct.new(class_name:     model.name,
-                                     message:        "Missing model #{a.name.to_s.camelize} for association #{model.name}.belongs_to :#{a.name}",
-                                     original_error: e,
-                                     level:          :error)
+            errors << ErrorObject.new(
+              class_name:     model.name,
+              message:        "Missing model #{a.name.to_s.camelize.singularize} for association #{model.name}.belongs_to :#{a.name}",
+              original_error: e,
+              level:          :error,
+              type:           :association
+            )
           end
         end
       end
@@ -55,9 +58,12 @@ class ActiveRecordSchemaScrapper
 
     def abstract_class
       if model.abstract_class?
-        errors << OpenStruct.new(class_name: model.name,
-                                 message:    "#{model.name} is an abstract class and has no associated table.",
-                                 level:      :warn)
+        errors << ErrorObject.new(
+          class_name: model.name,
+          message:    "#{model.name} is an abstract class and has no associated table.",
+          level:      :warn,
+          type:       :no_table
+        )
       end
     end
   end

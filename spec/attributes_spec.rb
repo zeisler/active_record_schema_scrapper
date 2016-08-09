@@ -69,6 +69,7 @@ describe ActiveRecordSchemaScrapper::Attributes do
       expect(error.message).to eq("InvalidClass is not a valid ActiveRecord model.")
       expect(error.original_error.to_s).to eq("undefined method `columns_hash' for InvalidClass:Class")
       expect(error.level).to eq(:error)
+      expect(error.type).to eq(:invalid_model)
     end
 
     it "has no table error for abstract class" do
@@ -76,9 +77,10 @@ describe ActiveRecordSchemaScrapper::Attributes do
       expect(subject.to_a).to eq([])
       error = subject.errors.first
       expect(error.class_name).to eq("HasNoTable")
-      expect(error.message).to eq("Could not find table for abstract_class")
+      expect(error.message).to eq("HasNoTable is an abstract class and has no associated table.")
       expect(error.original_error.to_s).to match(/Could not find table/)
       expect(error.level).to eq(:warn)
+      expect(error.type).to eq(:no_table)
     end
 
     it "has no table error for non abstract class" do
@@ -90,6 +92,7 @@ describe ActiveRecordSchemaScrapper::Attributes do
       expect(error.message).to match(/Could not find table/)
       expect(error.original_error.to_s).to match(/Could not find table/)
       expect(error.level).to eq(:error)
+      expect(error.type).to eq(:no_table)
     end
   end
 
