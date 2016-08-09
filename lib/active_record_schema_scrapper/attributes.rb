@@ -56,7 +56,7 @@ class ActiveRecordSchemaScrapper
           scale:     v.scale,
           default:   v.default,
           null:      v.null,
-          cast_type: v.cast_type
+          cast_type: cast_type(v)
         )
       end
     rescue NoMethodError => e
@@ -75,6 +75,14 @@ class ActiveRecordSchemaScrapper
                                  level:          level,
                                  type:           :no_table)
       []
+    end
+
+    def cast_type(v)
+      if v.respond_to?(:cast_type)
+        v.cast_type
+      elsif v.respond_to?(:sql_type_metadata)
+        v.sql_type_metadata
+      end
     end
   end
 end
