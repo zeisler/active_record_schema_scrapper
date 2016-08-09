@@ -5,9 +5,18 @@ require "active_record_schema_scrapper/attributes"
 
 describe ActiveRecordSchemaScrapper::Attributes do
   describe "Enumerable" do
+
+    def filter_results(enum)
+      enum.map do |e|
+        e.to_h.each_with_object({}) do |(k,v),h|
+          h[k] = v unless k == :cast_type || v.nil?
+        end
+      end
+    end
+
     context "returns columns with meta data" do
       it "User" do
-        expect(described_class.new(model: User).map(&:to_h).map { |h| h.reject { |_, v| v.nil? } })
+        expect(filter_results(described_class.new(model: User)))
           .to eq(
                 [{ name: "id", type: Fixnum },
                  { name: "name", type: String },
@@ -24,13 +33,13 @@ describe ActiveRecordSchemaScrapper::Attributes do
       context "Account" do
         it "can iterate over twice" do
           subject = described_class.new(model: Account)
-          expect(subject.map(&:to_h).map { |h| h.reject { |_, v| v.nil? } })
+          expect(filter_results(subject))
           .to eq(
                 [{ name: "id", type: Fixnum },
                  { name: "user_id", type: Fixnum },
                  { name: "balance", type: BigDecimal }]
               )
-          expect(subject.map(&:to_h).map { |h| h.reject { |_, v| v.nil? } })
+          expect(filter_results(subject))
             .to eq(
                   [{ name: "id", type: Fixnum },
                    { name: "user_id", type: Fixnum },
@@ -40,7 +49,7 @@ describe ActiveRecordSchemaScrapper::Attributes do
       end
 
       it "ChildModel" do
-        expect(described_class.new(model: ChildModel).map(&:to_h).map { |h| h.reject { |_, v| v.nil? } })
+        expect(filter_results(described_class.new(model: ChildModel)))
           .to eq(
                 [{ name: "id", type: Fixnum },
                  { name: "name", type: String },
@@ -103,6 +112,23 @@ describe ActiveRecordSchemaScrapper::Attributes do
       expect(ActiveRecordSchemaScrapper::Attribute.new(type: :array).type).to eq(Array)
     end
 
+    context "with cast_type" do
+      it "as a proc" do
+        cast_type_proc = -> (cast_type) {
+          cast_type.class.name.include?("Array")
+        }
+        described_class.register_type(name: :string, klass: Array[String], cast_type: cast_type_proc)
+        attribute = ActiveRecordSchemaScrapper::Attribute.new(type: :string, cast_type: Array, default: "{}")
+        expect(attribute.type).to eq(Array[String])
+      end
+
+      it "as a class" do
+        described_class.register_type(name: :string, klass: Array[String], cast_type: Array)
+        attribute = ActiveRecordSchemaScrapper::Attribute.new(type: :string, cast_type: Array, default: "{}")
+        expect(attribute.type).to eq(Array[String])
+      end
+    end
+
     context "unknown types will raise" do
 
       it "foo_type" do
@@ -122,6 +148,27 @@ describe ActiveRecordSchemaScrapper::Attributes do
     it "add default type converter" do
       described_class.register_default(name: "T", klass: true)
       expect(ActiveRecordSchemaScrapper::Attribute.new(default: :T).default).to eq(true)
+    end
+
+    context "with cast_type" do
+
+      it "as a proc" do
+        cast_type_proc = -> (cast_type) {
+          cast_type.class.name.include?("Array")
+        }
+        described_class.register_default(name: "{}", klass: [], cast_type: cast_type_proc, type: :string)
+        expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: Array, type: :string).default).to eq([])
+      end
+
+      it "as a class" do
+        described_class.register_default(name: "{}", klass: [], cast_type: Array, type: :string)
+        expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: Array, type: :string).default).to eq([])
+      end
+
+      it "without a type" do
+        described_class.register_default(name: "{}", klass: [], cast_type: Array)
+        expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: Array, type: :string).default).to eq([])
+      end
     end
 
     it "will pass nil if no registered value" do

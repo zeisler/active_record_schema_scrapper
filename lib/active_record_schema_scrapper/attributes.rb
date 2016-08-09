@@ -2,16 +2,23 @@ class ActiveRecordSchemaScrapper
   class Attributes
 
     class << self
-      def register_type(name:, klass:)
-        registered_types << [name, klass]
+      # @param [Symbol] name original type from schema
+      # @param [Object, Virtus::Attribute] klass a ruby type used to coerce values
+      # @param [Object#===, Proc#===] cast_type to be compared to the db schema returned value
+      def register_type(name:, klass:, cast_type: nil)
+        registered_types << [name, klass, cast_type]
       end
 
       def registered_types
         @registered_types ||= []
       end
 
-      def register_default(name:, klass:)
-        registered_defaults << [name, klass]
+      # @param [String] name original default value from schema
+      # @param [Object] klass the replacement value
+      # @param [Object#===, Proc#===] cast_type to be compared to the db schema returned value
+      # @param [Symbol] type matches the type from the schema
+      def register_default(name:, klass:, cast_type: nil, type: nil)
+        registered_defaults << [name, klass, cast_type, type]
       end
 
       def registered_defaults
@@ -49,23 +56,24 @@ class ActiveRecordSchemaScrapper
           scale:     v.scale,
           default:   v.default,
           null:      v.null,
+          cast_type: v.cast_type
         )
       end
     rescue NoMethodError => e
       @errors << ErrorObject.new(class_name:     model.name,
-                                message:        "#{model.name} is not a valid ActiveRecord model.",
-                                original_error: e,
-                                level:          :error,
-                                type:           :invalid_model)
+                                 message:        "#{model.name} is not a valid ActiveRecord model.",
+                                 original_error: e,
+                                 level:          :error,
+                                 type:           :invalid_model)
       []
     rescue ActiveRecord::StatementInvalid => e
       level   = model.abstract_class? ? :warn : :error
       message = model.abstract_class? ? "#{model.name} is an abstract class and has no associated table." : e.message
       @errors << ErrorObject.new(class_name:     model.name,
-                                message:        message,
-                                original_error: e,
-                                level:          level,
-                                type:           :no_table)
+                                 message:        message,
+                                 original_error: e,
+                                 level:          level,
+                                 type:           :no_table)
       []
     end
   end
