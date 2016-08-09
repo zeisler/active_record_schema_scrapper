@@ -6,7 +6,7 @@ class ActiveRecordSchemaScrapper
     ErrorObject = Class.new(ActiveMocker::ErrorObject)
   else
     class ErrorObject
-      include Virtus
+      include Virtus.model
       attribute :message
       attribute :level
       attribute :original_error
