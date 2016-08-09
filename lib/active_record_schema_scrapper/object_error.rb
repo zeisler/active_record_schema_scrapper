@@ -1,23 +1,17 @@
+# frozen_string_literal: true
+require "virtus"
+
 class ActiveRecordSchemaScrapper
-  class ErrorObject
-    attr_reader :level, :message, :class_name, :type, :original_error
-
-    def initialize(level: :warn, message:, class_name:, type:, original_error: nil)
-      @level          = level
-      @message        = message
-      @class_name     = class_name
-      @type           = type
-      @original_error = original_error
-    end
-
-    def original_error?
-      original_error.present?
-    end
-
-    private
-
-    def self.levels
-      [:info, :warn, :error, :fatal]
+  if defined?(ActiveMocker::ErrorObject)
+    ErrorObject = Class.new(ActiveMocker::ErrorObject)
+  else
+    class ErrorObject
+      include Virtus.model
+      attribute :message
+      attribute :level
+      attribute :original_error
+      attribute :type
+      attribute :class_name
     end
   end
 end

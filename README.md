@@ -40,6 +40,36 @@ Or install it yourself as:
         #=> []
 ```
 
+#### Registering Types
+
+This gem does not include all the mappings from any DB type to a Ruby type. (most common types are included)
+So any arbitrary type can be registered.
+
+# Postgres Array Type
+```ruby
+
+    # schema.rb
+      #...
+      t.string :tags, array: true, default: []
+      #...
+      
+    # initilizers/active_mocker.rb
+    ActiveRecordSchemaScrapper::Attributes.register_type(
+      name:      :string, 
+      klass:     Array[String], 
+      cast_type: -> (c) { c.class.name.include?("Array") } 
+    )
+    
+     ActiveRecordSchemaScrapper::Attributes.register_default(
+       name:      "{}", 
+       klass:     [], 
+       cast_type: -> (c) { c.class.name.include?("Array") } 
+     )
+    
+    ActiveRecordSchemaScrapper::Attributes.new(model: User).map(&:to_h)
+      #=>[{ name: "tags",               type: Array[String], default: []  }]
+```
+
 ### Associations
 ```ruby
     ActiveRecordSchemaScrapper::Associations.new(model: User).map(&:to_h)
