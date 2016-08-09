@@ -107,6 +107,10 @@ describe ActiveRecordSchemaScrapper::Attributes do
 
   describe "::register_type" do
 
+    after do
+      described_class.registered_types.clear
+    end
+
     it "add new type" do
       described_class.register_type(name: :array, klass: Array)
       expect(ActiveRecordSchemaScrapper::Attribute.new(type: :array).type).to eq(Array)
@@ -144,6 +148,10 @@ describe ActiveRecordSchemaScrapper::Attributes do
   end
 
   describe "::register_default" do
+
+    after do
+      described_class.registered_defaults.clear
+    end
 
     it "add default type converter" do
       described_class.register_default(name: "T", klass: true)
