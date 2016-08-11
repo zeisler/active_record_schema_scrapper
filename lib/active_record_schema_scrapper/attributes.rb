@@ -1,15 +1,15 @@
 class ActiveRecordSchemaScrapper
   class Attributes
     DEFAULT_REGISTERED_TYPES = [
-      { type: :integer, replacement_type: Integer },
-      { type: :float, replacement_type: Float },
-      { type: :decimal, replacement_type: BigDecimal },
-      { type: Proc.new { |type| [:timestamp, :time].include?(type) }, replacement_type: Time },
-      { type: :datetime, replacement_type: DateTime },
-      { type: :date, replacement_type: Date },
-      { type: Proc.new { |type| [:text, :string, :binary].include?(type) }, replacement_type: String },
-      { type: :boolean, replacement_type: Axiom::Types::Boolean },
-      { type: :hstore, replacement_type: Hash },
+      { type: :integer,                                            replacement_type: Integer },
+      { type: :float,                                              replacement_type: Float },
+      { type: :decimal,                                            replacement_type: BigDecimal },
+      { type: Proc.new { |t| [:timestamp, :time].include?(t) },    replacement_type: Time },
+      { type: :datetime,                                           replacement_type: DateTime },
+      { type: :date,                                               replacement_type: Date },
+      { type: Proc.new { |t| %i{text string binary}.include?(t) }, replacement_type: String },
+      { type: :boolean,                                            replacement_type: Axiom::Types::Boolean },
+      { type: :hstore,                                             replacement_type: Hash },
     ].freeze
 
     DEFAULT_REGISTERED_DEFAULTS = [
