@@ -27,7 +27,7 @@ describe ActiveRecordSchemaScrapper::Attributes do
       it "User" do
         expect(filter_results(subject))
           .to eq(
-                [{ name: "id", type: Fixnum },
+                [{ name: "id", type: Integer },
                  { name: "name", type: String },
                  { name: "email", type: String, default: "" },
                  { name: "credits", type: BigDecimal, precision: 19, scale: 6 },
@@ -44,14 +44,14 @@ describe ActiveRecordSchemaScrapper::Attributes do
         it "can iterate over twice" do
           expect(filter_results(subject))
           .to eq(
-                [{ name: "id", type: Fixnum },
-                 { name: "user_id", type: Fixnum },
+                [{ name: "id", type: Integer },
+                 { name: "user_id", type: Integer },
                  { name: "balance", type: BigDecimal }]
               )
           expect(filter_results(subject))
             .to eq(
-                  [{ name: "id", type: Fixnum },
-                   { name: "user_id", type: Fixnum },
+                  [{ name: "id", type: Integer },
+                   { name: "user_id", type: Integer },
                    { name: "balance", type: BigDecimal }]
                 )
         end
@@ -62,7 +62,7 @@ describe ActiveRecordSchemaScrapper::Attributes do
         it do
           expect(filter_results(subject))
             .to eq(
-                  [{ name: "id", type: Fixnum },
+                  [{ name: "id", type: Integer },
                    { name: "name", type: String },
                    { name: "email", type: String, default: "" },
                    { name: "credits", type: BigDecimal, precision: 19, scale: 6 },
@@ -120,7 +120,7 @@ describe ActiveRecordSchemaScrapper::Attributes do
   describe "::register_type" do
 
     after do
-      described_class.registered_types.clear
+      described_class.reset_registered_types
     end
 
     it "add new type" do
@@ -131,7 +131,7 @@ describe ActiveRecordSchemaScrapper::Attributes do
     context "with cast_type" do
       it "as a proc" do
         cast_type_proc = -> (cast_type) {
-          cast_type.class.name.include?("Array")
+          cast_type == Array
         }
         described_class.register_type(name: :string, klass: Array[String], cast_type: cast_type_proc)
         attribute = ActiveRecordSchemaScrapper::Attribute.new(type: :string, cast_type: Array, default: "{}")
@@ -142,6 +142,19 @@ describe ActiveRecordSchemaScrapper::Attributes do
         described_class.register_type(name: :string, klass: Array[String], cast_type: Array)
         attribute = ActiveRecordSchemaScrapper::Attribute.new(type: :string, cast_type: Array, default: "{}")
         expect(attribute.type).to eq(Array[String])
+      end
+
+      it "does not catch on type alone" do
+        described_class.register_type(name: :string, klass: Array[String], cast_type: Array)
+        attribute = ActiveRecordSchemaScrapper::Attribute.new(type: :string, cast_type: String, default: 0)
+        expect(attribute.type).to eq(String)
+      end
+
+      it "matches on the top ranking" do
+        described_class.register_type(name: :super_string, klass: Array[String])
+        described_class.register_type(name: :super_string, klass: String, cast_type: String)
+        attribute = ActiveRecordSchemaScrapper::Attribute.new(type: :super_string, cast_type: String, default: 0)
+        expect(attribute.type).to eq(String)
       end
     end
 
@@ -161,34 +174,48 @@ describe ActiveRecordSchemaScrapper::Attributes do
 
   describe "::register_default" do
 
+    before do
+      described_class.reset_registered_types
+      described_class.reset_registered_defaults
+    end
+
     after do
-      described_class.registered_defaults.clear
+      described_class.reset_registered_types
+      described_class.reset_registered_defaults
     end
 
     it "add default type converter" do
       described_class.register_default(name: "T", klass: true)
-      expect(ActiveRecordSchemaScrapper::Attribute.new(default: :T).default).to eq(true)
+      expect(ActiveRecordSchemaScrapper::Attribute.new(default: "T").default).to eq(true)
     end
 
-    context "with cast_type" do
+    it "as a proc" do
+      cast_type_proc = -> (cast_type) {
+        cast_type == Array
+      }
+      described_class.register_default(default: "{}", replacement_default: [], cast_type: cast_type_proc, type: :string)
+      expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: Array, type: :string).default).to eq([])
+    end
 
-      it "as a proc" do
-        cast_type_proc = -> (cast_type) {
-          cast_type.class.name.include?("Array")
-        }
-        described_class.register_default(name: "{}", klass: [], cast_type: cast_type_proc, type: :string)
-        expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: Array, type: :string).default).to eq([])
-      end
+    it "as a class" do
+      described_class.register_default(default: "{}", replacement_default: [], cast_type: Array, type: :string)
+      expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: Array, type: :string).default).to eq([])
+    end
 
-      it "as a class" do
-        described_class.register_default(name: "{}", klass: [], cast_type: Array, type: :string)
-        expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: Array, type: :string).default).to eq([])
-      end
+    it "without a type" do
+      described_class.register_default(default: "{}", replacement_default: [], cast_type: Array)
+      expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: Array, type: :string).default).to eq([])
+    end
 
-      it "without a type" do
-        described_class.register_default(name: "{}", klass: [], cast_type: Array)
-        expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: Array, type: :string).default).to eq([])
-      end
+    it "does not catch register when cast_type is different" do
+      described_class.register_default(default: "{}", replacement_default: [], cast_type: Array, type: :string)
+      expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: String, type: :string).default).to eq("{}")
+    end
+
+    it "does not catch register when type is different" do
+      described_class.register_default(default: "{}", replacement_default: [], cast_type: Array, type: :string)
+      puts "registered_defaults count: #{described_class.registered_defaults.count}"
+      expect(ActiveRecordSchemaScrapper::Attribute.new(default: "{}", cast_type: Array, type: :decimal).default).to eq("{}")
     end
 
     it "will pass nil if no registered value" do

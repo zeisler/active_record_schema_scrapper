@@ -17,98 +17,51 @@ class ActiveRecordSchemaScrapper
                    limit: nil,
                    null: nil)
 
-      type    = init_type(type, cast_type)
-      default = init_default(default, cast_type, type)
+      default = init_default({ default: default, cast_type: cast_type, type: type })
+      type    = init_type(type, { type: type, cast_type: cast_type })
       super
     end
 
-    def init_type(type, cast_type)
-      return type unless type
-      registered_type = Attributes.registered_types.detect do |reg_type, klass, reg_cast_type|
-        if type.to_sym == reg_type.to_sym && reg_cast_type && reg_cast_type === cast_type
-          klass
-        elsif type.to_sym == reg_type.to_sym
-          klass
-        end
+    private
+
+    def init_type(name, attr_values)
+      type = match_abstract(:replacement_type, :type, Attributes.registered_types, attr_values)
+      if type.is_a?(String) || type.is_a?(Symbol)
+        raise UnregisteredType.new "Database type '#{attr_values[:type]}' is not a registered type.\nTo register use ActiveRecordSchemaScrapper::Attributes.register_type(name: :#{name}, klass: <RubyClass>)"
+      else
+        type
       end
-      (registered_type && !registered_type.empty?) ? registered_type[1] : type
     end
 
-    def init_default(default, cast_type, type)
-      return default unless default
-      registered_default = Attributes.registered_defaults.detect do |reg_default, klass, reg_cast_type, reg_type|
-        if (default.to_s == reg_default.to_s) && ((reg_cast_type && reg_cast_type === cast_type) || (type === reg_type))
-          klass
-        elsif default.to_s == reg_default.to_s
-          klass
-        end
-      end
-      (registered_default && !registered_default.empty?) ? registered_default[1] : default
+    def init_default(attr_values)
+      match_abstract(:replacement_default, :default, Attributes.registered_defaults, attr_values)
     end
 
-    class DBToRubyType < Virtus::Attribute
-      def coerce(value)
-        return value if value.nil?
-        return value unless value.is_a?(String) || value.is_a?(Symbol)
-        case value.to_sym
-          when :integer
-            Fixnum
-          when :float
-            Float
-          when :decimal
-            BigDecimal
-          when :timestamp, :time
-            Time
-          when :datetime
-            DateTime
-          when :date
-            Date
-          when :text, :string, :binary
-            String
-          when :boolean
-            Axiom::Types::Boolean
-          when :hstore
-            Hash
-          else
-            registered(value) do
-              raise UnregisteredType.new "Database type '#{value}' is not a registered type.\nTo register use ActiveRecordSchemaScrapper::Attributes.register_type(name: :#{value}, klass: <RubyClass>)"
-            end
+    def match_abstract(replacement_key, default, registers, attr_values)
+      return unless attr_values[default]
+      top_ranked_match     = nil
+      last_top_match_count = 0
+      registers.each do |register|
+        all_given = register.reject { |_, v| v == :not_given }.dup
+        all_given.delete(replacement_key)
+
+        matches         = all_given.map do |k, v|
+          attr_values.has_key?(k) ? (v === attr_values[k] || v == attr_values[k]) : true
+        end
+        max_match_count = matches.inject(0) { |sum, bool| bool ? sum += 1 : sum -= 10 }
+        if max_match_count > 0 && max_match_count > last_top_match_count
+          last_top_match_count = max_match_count
+          top_ranked_match     = register
         end
       end
 
-      def registered(value)
-        if (a = Attributes.registered_types.detect { |name, _, _| value.to_sym == name.to_sym })
-          a.last
-        else
-          yield
-        end
-      end
+      top_ranked_match ? top_ranked_match[replacement_key] : attr_values[default]
     end
-    attribute :type, DBToRubyType
+
+    attribute :type
     attribute :precision, Fixnum
     attribute :scale, Fixnum
-    class DefaultValueType < Virtus::Attribute
-      def coerce(value)
-        return value unless value.is_a?(String) || value.is_a?(Symbol)
-        case value.to_s
-          when 'f'
-            false
-          when 't'
-            true
-          else
-            registered(value)
-        end
-      end
-
-      def registered(value)
-        if (r = Attributes.registered_defaults.detect { |name, _, _| name.to_s == value.to_s })
-          r[1]
-        else
-          value
-        end
-      end
-    end
-    attribute :default, DefaultValueType
+    attribute :default
     attribute :cast_type
   end
 end
