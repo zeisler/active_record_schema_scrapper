@@ -84,7 +84,6 @@ describe ActiveRecordSchemaScrapper::Attributes do
       end
 
       subject = described_class.new(model: InvalidClass)
-      expect(subject.to_a).to eq([])
       error = subject.errors.first
       expect(error.class_name).to eq("InvalidClass")
       expect(error.message).to eq("InvalidClass is not a valid ActiveRecord model.")
@@ -95,7 +94,6 @@ describe ActiveRecordSchemaScrapper::Attributes do
 
     it "has no table error for abstract class" do
       subject = described_class.new(model: HasNoTable)
-      expect(subject.to_a).to eq([])
       error = subject.errors.first
       expect(error.class_name).to eq("HasNoTable")
       expect(error.message).to eq("HasNoTable is an abstract class and has no associated table.")
@@ -107,7 +105,6 @@ describe ActiveRecordSchemaScrapper::Attributes do
     it "has no table error for non abstract class" do
       subject = described_class.new(model: HasNoTable)
       allow(HasNoTable).to receive(:abstract_class?){false}
-      expect(subject.to_a).to eq([])
       error = subject.errors.first
       expect(error.class_name).to eq("HasNoTable")
       expect(error.message).to match(/Could not find table/)

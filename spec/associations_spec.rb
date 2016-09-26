@@ -53,7 +53,6 @@ describe ActiveRecordSchemaScrapper::Associations do
         context 'when an association cannot not be found' do
           it 'is added to the errors array' do
             subject = described_class.new(model: User, types: [:belongs_to])
-            expect(subject.to_a).to eq([])
             error = subject.errors.first
             expect(error.message).to eq('Missing model IDontExist for association User.belongs_to :i_dont_exist')
             expect(error.class_name).to eq("User")
@@ -66,7 +65,6 @@ describe ActiveRecordSchemaScrapper::Associations do
         context 'when a table is an abstract class' do
           it 'is added to the errors array' do
             subject = described_class.new(model: OpenStruct.new(abstract_class?: true, name: "AbstractClass"))
-            expect(subject.to_a).to eq([])
             error = subject.errors.first
             expect(error.message).to eq("AbstractClass is an abstract class and has no associated table.")
             expect(error.class_name).to eq("AbstractClass")

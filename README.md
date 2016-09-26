@@ -61,9 +61,9 @@ So any arbitrary type can be registered.
     )
     
      ActiveRecordSchemaScrapper::Attributes.register_default(
-       name:      "{}", 
-       klass:     [], 
-       cast_type: -> (c) { c.class.name.include?("Array") } 
+       default:             "{}", 
+       replacement_default: [], 
+       cast_type:           -> (c) { c.class.name.include?("Array") } 
      )
     
     ActiveRecordSchemaScrapper::Attributes.new(model: User).map(&:to_h)
