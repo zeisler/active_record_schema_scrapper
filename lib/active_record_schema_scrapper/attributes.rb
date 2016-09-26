@@ -76,7 +76,7 @@ class ActiveRecordSchemaScrapper
       end
     end
 
-    attr_reader :errors, :model
+    attr_reader :model
     private :model
 
     def initialize(model:)
@@ -92,6 +92,11 @@ class ActiveRecordSchemaScrapper
 
     def to_a
       @to_a ||= map { |v| v }
+    end
+
+    def errors
+      to_a
+      @errors
     end
 
     private

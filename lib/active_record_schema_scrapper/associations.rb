@@ -7,6 +7,11 @@ class ActiveRecordSchemaScrapper
       @errors = []
     end
 
+    def errors
+      to_a
+      @errors
+    end
+
     include Enumerable
 
     def each
@@ -30,7 +35,7 @@ class ActiveRecordSchemaScrapper
 
             yield(ActiveRecordSchemaScrapper::Association.new(hash))
           rescue NameError => e
-            errors << ErrorObject.new(
+            @errors << ErrorObject.new(
               class_name:     model.name,
               message:        "Missing model #{a.name.to_s.camelize.singularize} for association #{model.name}.belongs_to :#{a.name}",
               original_error: e,
@@ -50,15 +55,13 @@ class ActiveRecordSchemaScrapper
       [:has_and_belongs_to_many, :belongs_to, :has_one, :has_many]
     end
 
-    attr_reader :errors
-
     private
 
     attr_reader :model, :types
 
     def abstract_class
       if model.abstract_class?
-        errors << ErrorObject.new(
+        @errors << ErrorObject.new(
           class_name: model.name,
           message:    "#{model.name} is an abstract class and has no associated table.",
           level:      :warn,
