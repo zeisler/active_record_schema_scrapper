@@ -112,6 +112,18 @@ describe ActiveRecordSchemaScrapper::Attributes do
       expect(error.level).to eq(:error)
       expect(error.type).to eq(:no_table)
     end
+
+    it "has no table error for non abstract class with TypeError" do
+      subject = described_class.new(model: HasNoTable)
+      allow(HasNoTable).to receive(:abstract_class?){true}
+      allow(HasNoTable).to receive(:columns_hash).and_raise(TypeError)
+      error = subject.errors.first
+      expect(error.class_name).to eq("HasNoTable")
+      expect(error.message).to eq("HasNoTable is an abstract class and has no associated table.")
+      expect(error.original_error.to_s).to match(/TypeError/)
+      expect(error.level).to eq(:warn)
+      expect(error.type).to eq(:no_table)
+    end
   end
 
   describe "::register_type" do

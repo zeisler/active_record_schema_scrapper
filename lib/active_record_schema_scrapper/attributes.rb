@@ -102,7 +102,19 @@ class ActiveRecordSchemaScrapper
     private
 
     def call
-      @attributes ||= model.columns_hash.map do |k, v|
+      @attributes ||= begin
+        parse_attributes
+      rescue NoMethodError => e
+        no_method_error(e)
+      rescue TypeError => e
+        model.try!(:abstract_class?) ? statement_invalid(e) : []
+      rescue ActiveRecord::StatementInvalid => e
+        statement_invalid(e)
+      end
+    end
+
+    def parse_attributes
+      model.columns_hash.map do |k, v|
         ActiveRecordSchemaScrapper::Attribute.new(
           name:      k,
           type:      v.type,
@@ -114,16 +126,21 @@ class ActiveRecordSchemaScrapper
           cast_type: cast_type(v)
         )
       end
-    rescue NoMethodError => e
+    end
+
+    def no_method_error(e)
+      puts e.message
       @errors << ErrorObject.new(class_name:     model.name,
                                  message:        "#{model.name} is not a valid ActiveRecord model.",
                                  original_error: e,
                                  level:          :error,
                                  type:           :invalid_model)
       []
-    rescue ActiveRecord::StatementInvalid => e
+    end
+
+    def statement_invalid(e)
       level   = model.abstract_class? ? :warn : :error
-      message = model.abstract_class? ? "#{model.name} is an abstract class and has no associated table." : e.message
+      message = model.abstract_class? ? "#{model.name} is an abstract class and has no associated table." : e.try!(:message)
       @errors << ErrorObject.new(class_name:     model.name,
                                  message:        message,
                                  original_error: e,
