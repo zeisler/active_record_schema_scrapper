@@ -59,8 +59,8 @@ class ActiveRecordSchemaScrapper
     end
 
     attribute :type
-    attribute :precision, Fixnum
-    attribute :scale, Fixnum
+    attribute :precision, Integer
+    attribute :scale, Integer
     attribute :default
     attribute :cast_type
   end
