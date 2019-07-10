@@ -35,11 +35,11 @@ describe ActiveRecordSchemaScrapper::Associations do
       it do
         expect(described_class.new(model: User).map(&:to_h))
           .to eq([
-                   { name: :account, class_name: :Account, type: :has_one, through: nil, source: nil, foreign_key: :user_id, join_table: nil, dependent: nil },
-                   { name: :microposts, class_name: :Micropost, type: :has_many, through: nil, source: nil, foreign_key: :user_id, join_table: nil, dependent: nil },
-                   { name: :relationships, class_name: :Relationship, type: :has_many, through: nil, source: nil, foreign_key: :follower_id, join_table: nil, dependent: :destroy },
+                   { name: :account, class_name: :Account, type: :has_one, through: nil, source: :account, foreign_key: :user_id, join_table: nil, dependent: nil },
+                   { name: :microposts, class_name: :Micropost, type: :has_many, through: nil, source: :microposts, foreign_key: :user_id, join_table: nil, dependent: nil },
+                   { name: :relationships, class_name: :Relationship, type: :has_many, through: nil, source: :relationships, foreign_key: :follower_id, join_table: nil, dependent: :destroy },
                    { name: :followed_users, class_name: :User, type: :has_many, through: :relationships, source: :followed, foreign_key: :followed_id, join_table: nil, dependent: nil },
-                   { name: :reverse_relationships, class_name: :Relationship, type: :has_many, through: nil, source: nil, foreign_key: :followed_id, join_table: nil, dependent: :destroy },
+                   { name: :reverse_relationships, class_name: :Relationship, type: :has_many, through: nil, source: :reverse_relationships, foreign_key: :followed_id, join_table: nil, dependent: :destroy },
                    { name: :followers, :class_name => :User, :type => :has_many, :through => :reverse_relationships, :source => :follower, :foreign_key => :follower_id, :join_table => nil, :dependent => nil }
                  ])
       end
@@ -89,12 +89,12 @@ describe ActiveRecordSchemaScrapper::Associations do
 
     it 'microposts' do
       expect(subject.detect { |a| a.name == :microposts }.to_h)
-        .to eq({ name: :microposts, class_name: :Micropost, type: :has_many, through: nil, source: nil, foreign_key: :user_id, join_table: nil, dependent: nil })
+        .to eq({ name: :microposts, class_name: :Micropost, type: :has_many, through: nil, source: :microposts, foreign_key: :user_id, join_table: nil, dependent: nil })
     end
 
     it 'relationships' do
       expect(subject.detect { |a| a.name == :relationships }.to_h)
-        .to eq({ name: :relationships, class_name: :Relationship, type: :has_many, through: nil, source: nil, foreign_key: :follower_id, join_table: nil, dependent: :destroy })
+        .to eq({ name: :relationships, class_name: :Relationship, type: :has_many, through: nil, source: :relationships, foreign_key: :follower_id, join_table: nil, dependent: :destroy })
     end
 
     it 'followed_users' do
@@ -104,7 +104,7 @@ describe ActiveRecordSchemaScrapper::Associations do
 
     it 'reverse_relationships' do
       expect(subject.detect { |a| a.name == :reverse_relationships }.to_h)
-        .to eq({ name: :reverse_relationships, class_name: :Relationship, type: :has_many, through: nil, source: nil, foreign_key: :followed_id, join_table: nil, dependent: :destroy })
+        .to eq({ name: :reverse_relationships, class_name: :Relationship, type: :has_many, through: nil, source: :reverse_relationships, foreign_key: :followed_id, join_table: nil, dependent: :destroy })
     end
 
     it 'followers' do
@@ -114,7 +114,7 @@ describe ActiveRecordSchemaScrapper::Associations do
 
     it 'account' do
       expect(subject.detect { |a| a.name == :account }.to_h)
-        .to eq({ name: :account, class_name: :Account, type: :has_one, through: nil, source: nil, foreign_key: :user_id, join_table: nil, dependent: nil })
+        .to eq({ name: :account, class_name: :Account, type: :has_one, through: nil, source: :account, foreign_key: :user_id, join_table: nil, dependent: nil })
     end
   end
 end
