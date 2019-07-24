@@ -11,4 +11,3 @@ matrix:
   exclude:
     - rvm: 2.3.8
       gemfile: gemfiles/activerecord_6.gemfile
-
