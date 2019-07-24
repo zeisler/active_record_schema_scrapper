@@ -25,8 +25,8 @@ class ActiveRecordSchemaScrapper
                        dependent: a.delegate_reflection.options[:dependent],
                      }
                    else
-                     { source:    a.try(:delegate_reflection).try(:name),
-                       through:   a.try(:through),
+                     { source:    (a.try(:delegate_reflection) || a.try(:source_reflection)).try(:name),
+                       through:   a.try(:through) || a.try(:through_reflection).try(:name),
                        dependent: a.options[:dependent] }
                    end.merge(name:        a.name,
                              foreign_key: a.foreign_key,
