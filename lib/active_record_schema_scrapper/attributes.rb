@@ -13,8 +13,10 @@ class ActiveRecordSchemaScrapper
     ].freeze
 
     DEFAULT_REGISTERED_DEFAULTS = [
-      { default: Proc.new { |d| %w(t 1).include?(d) }, replacement_default: true },
-      { default: Proc.new { |d| %w(f 0).include?(d) }, replacement_default: false }
+      { default: Proc.new { |d| d == 't' }, replacement_default: true, type: :boolean },
+      { default: Proc.new { |d| d == 'f' }, replacement_default: false, type: :boolean },
+      { default: Proc.new { |d| d == '1' }, replacement_default: true, type: :boolean },
+      { default: Proc.new { |d| d == '0' }, replacement_default: false, type: :boolean }
     ].freeze
 
     class << self
